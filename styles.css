@@ -176,9 +176,9 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
 .logo-link { display: block; }
 .logo-wrap { text-align: center; }
 .site-logo {
-  height: 70px;
+  height: 85px;
   width: auto;
-  max-width: 280px;
+  max-width: 420px;
   object-fit: contain;
   display: block;
   margin: 0 auto;

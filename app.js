@@ -250,6 +250,7 @@ const State = {
 const CAT_LABELS = {
   All: "सभी समाचार",
   Chhattisgarh: "छत्तीसगढ़",
+  JanjgirChampa: "जांजगीर-चांपा",
   Politics: "राजनीति",
   Crime: "अपराध",
   Business: "व्यापार",
