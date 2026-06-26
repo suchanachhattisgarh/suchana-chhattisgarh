@@ -1,7 +1,7 @@
 /**
  * SUCHANA CHHATTISGARH — app.js
  * Static News Portal Application (GitHub + Netlify ready)
- * No backend required — uses localStorage for persistence
+ * Connected to Firebase Realtime Database
  */
 
 'use strict';
@@ -12,15 +12,20 @@
 const firebaseConfig = {
   databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com/"
 };
+
 // Initialize Firebase
 if (typeof firebase !== 'undefined') {
   firebase.initializeApp(firebaseConfig);
+} else {
+  console.error("Firebase SDK not loaded.");
+  setTimeout(() => {
+    showToast("डेटाबेस लोड नहीं हुआ (Firebase SDK Missing/Blocked)!", "error");
+  }, 1500);
 }
 const db = typeof firebase !== 'undefined' ? firebase.database() : null;
 
-
 /* ============================================================
-   SAMPLE NEWS DATABASE (Static - editable via Admin Panel)
+   SAMPLE NEWS DATABASE (Used for seeding Firebase if empty)
    ============================================================ */
 const DEFAULT_NEWS = [
   {
@@ -132,7 +137,7 @@ const DEFAULT_NEWS = [
   },
   {
     id: 8,
-    title: "दुर्ग में पुलिस ने 2 करोड़ की ड्रग्स जब्त की, 3 गिरफ्तार",
+    title: "दुर्ग में police ने 2 करोड़ की drugs जब्त की, 3 गिरफ्तार",
     summary: "दुर्ग पुलिस ने एक बड़े ड्रग तस्करी नेटवर्क का भंडाफोड़ करते हुए 2 करोड़ की मादक सामग्री जब्त की।",
     content: `दुर्ग जिला पुलिस ने एक बड़ी कार्रवाई में ड्रग तस्करी नेटवर्क का पर्दाफाश किया है। SP दुर्ग ने बताया कि इस कार्रवाई में तीन तस्करों को गिरफ्तार किया गया है और ₹2 करोड़ मूल्य की मादक सामग्री बरामद की गई।
 
@@ -198,7 +203,7 @@ const DEFAULT_NEWS = [
 
     सांस्कृतिक मंत्री ने बताया कि इस बार हरेली उत्सव में छत्तीसगढ़ के पारंपरिक लोक कलाओं का प्रदर्शन होगा और साथ ही आधुनिक तकनीक का भी उपयोग किया जाएगा।`,
     category: "Chhattisgarh",
-    image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&auto=format&fit=crop",
     date: "20 जून 2026",
     views: 4890,
     readtime: "3 मिनट",
@@ -223,14 +228,13 @@ const WEATHER_DATA = {
 };
 
 /* ============================================================
-   STATE MANAGEMENT
+   STATE MANAGEMENT (Public Client Only)
    ============================================================ */
 const State = {
   news: [],
   poll: {},
   currentCat: "All",
   loadedCount: 6,
-  adminLoggedIn: false,
 
   load() {
     // 1. Local storage cache for instant offline load
@@ -268,7 +272,6 @@ const State = {
 
         // Re-render UI components
         renderAll();
-        if (State.adminLoggedIn) renderAdminNewsList();
       }, (error) => {
         console.error("Firebase News Sync Error:", error);
         showToast("डेटाबेस एरर (News): " + error.message, "error");
@@ -300,21 +303,21 @@ const State = {
   },
   save() {
     // Keep local storage cache updated
-    localStorage.setItem('suchana_news', JSON.stringify(this.news));
-    localStorage.setItem('suchana_poll', JSON.stringify(this.poll));
+    localStorage.setItem('suchana_news', JSON.stringify(State.news));
+    localStorage.setItem('suchana_poll', JSON.stringify(State.poll));
   },
   getFiltered() {
-    if (this.currentCat === "All") return this.news;
-    return this.news.filter(n => n.category === this.currentCat);
+    if (this.currentCat === "All") return State.news;
+    return State.news.filter(n => n.category === this.currentCat);
   },
   getFeatured() {
-    return this.news.find(n => n.featured) || this.news[0];
+    return State.news.find(n => n.featured) || State.news[0];
   },
   getBreaking() {
-    return this.news.filter(n => n.breaking).map(n => n.title);
+    return State.news.filter(n => n.breaking).map(n => n.title);
   },
   getTrending() {
-    return [...this.news].sort((a, b) => b.views - a.views).slice(0, 5);
+    return [...State.news].sort((a, b) => b.views - a.views).slice(0, 5);
   }
 };
 
@@ -354,15 +357,19 @@ function formatViews(n) {
   return n.toString();
 }
 function el(id) { return document.getElementById(id); }
+
 function showToast(msg, type = 'success') {
   const wrap = el('toast-wrap');
+  if (!wrap) return;
   const t = document.createElement('div');
   t.className = `toast toast-${type}`;
   t.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'circle-check' : 'circle-exclamation'}"></i> ${msg}`;
   wrap.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(30px)'; t.style.transition = '0.3s ease'; setTimeout(() => t.remove(), 350); }, 3000);
 }
+
 function generateId() { return Date.now() + Math.floor(Math.random() * 1000); }
+
 function defaultImg(cat) {
   const imgs = {
     Chhattisgarh: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&auto=format&fit=crop",
@@ -802,275 +809,6 @@ function setupCitizenForm() {
 }
 
 /* ============================================================
-   ADMIN PANEL
-   ============================================================ */
-function setupAdmin() {
-  const portalLink = el('admin-portal-link');
-  const backdrop = el('admin-modal-backdrop');
-  const closeBtn = el('admin-modal-close');
-  const loginPanel = el('admin-login-panel');
-  const dashPanel = el('admin-dash-panel');
-
-  function openAdminModal() {
-    if (backdrop) { backdrop.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-    if (State.adminLoggedIn) { loginPanel.style.display = 'none'; dashPanel.style.display = 'block'; renderAdminNewsList(); }
-    else { loginPanel.style.display = 'block'; dashPanel.style.display = 'none'; }
-  }
-  function closeAdminModal() {
-    if (backdrop) { backdrop.style.display = 'none'; document.body.style.overflow = ''; }
-  }
-
-  if (portalLink) portalLink.onclick = (e) => { e.preventDefault(); openAdminModal(); };
-  if (closeBtn) closeBtn.onclick = closeAdminModal;
-  if (backdrop) backdrop.onclick = (e) => { if (e.target === backdrop) closeAdminModal(); };
-
-  // Login
-  const loginBtn = el('admin-login-btn');
-  if (loginBtn) loginBtn.onclick = () => {
-    const pass = el('admin-pass-input')?.value;
-    if (pass === 'admin123') {
-      State.adminLoggedIn = true;
-      loginPanel.style.display = 'none';
-      dashPanel.style.display = 'block';
-      renderAdminNewsList();
-      showToast('एडमिन लॉगिन सफल!');
-    } else {
-      showToast('गलत पासवर्ड। पुनः प्रयास करें।', 'error');
-    }
-  };
-  if (el('admin-pass-input')) {
-    el('admin-pass-input').onkeydown = (e) => { if (e.key === 'Enter') loginBtn?.click(); };
-  }
-
-  // Logout
-  const logoutBtn = el('admin-logout-btn');
-  if (logoutBtn) logoutBtn.onclick = () => {
-    State.adminLoggedIn = false;
-    dashPanel.style.display = 'none';
-    loginPanel.style.display = 'block';
-    if (el('admin-pass-input')) el('admin-pass-input').value = '';
-  };
-
-  // Tab switching
-  document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-      tab.classList.add('active');
-      const target = el('tab-' + tab.dataset.tab);
-      if (target) target.classList.add('active');
-      if (tab.dataset.tab === 'manage-news') renderAdminNewsList();
-    };
-  });
-
-  // ---- IMAGE UPLOAD HANDLER ----
-  let uploadedImgData = null; // stores base64 string of uploaded image
-
-  const imgFileInput = el('anf-imgfile');
-  const imgPreviewWrap = el('img-preview-wrap');
-  const imgPreview = el('img-preview');
-  const imgRemoveBtn = el('img-remove-btn');
-  const imgUploadLabel = document.querySelector('.img-upload-label');
-
-  const IMGBB_API_KEY = '5368bd0e8283baec2685b3029510756e';
-
-  if (imgFileInput) {
-    imgFileInput.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      // Size check: max 5MB for imgBB
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('इमेज 5MB से छोटी होनी चाहिए!', 'error');
-        imgFileInput.value = '';
-        return;
-      }
-
-      // Show loading state
-      if (imgUploadLabel) {
-        imgUploadLabel.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> अपलोड हो रही है...';
-        imgUploadLabel.style.pointerEvents = 'none';
-      }
-
-      try {
-        // Convert to base64 first for preview
-        const base64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => resolve(ev.target.result.split(',')[1]);
-          reader.readAsDataURL(file);
-        });
-
-        // Show preview immediately
-        if (imgPreview) imgPreview.src = 'data:image/jpeg;base64,' + base64;
-        if (imgPreviewWrap) imgPreviewWrap.style.display = 'block';
-
-        // Upload to ImgBB
-        const formData = new FormData();
-        formData.append('key', IMGBB_API_KEY);
-        formData.append('image', base64);
-
-        const response = await fetch('https://api.imgbb.com/1/upload', {
-          method: 'POST',
-          body: formData
-        });
-        const result = await response.json();
-
-        if (result.success) {
-          uploadedImgData = result.data.url; // public URL from imgBB
-          if (imgPreview) imgPreview.src = uploadedImgData;
-          if (el('anf-imgurl')) { el('anf-imgurl').value = uploadedImgData; el('anf-imgurl').disabled = true; }
-          if (imgUploadLabel) imgUploadLabel.style.display = 'none';
-          showToast('इमेज ImgBB पर upload हो गई! ✅ सबको दिखेगी!');
-        } else {
-          throw new Error('Upload failed');
-        }
-
-      } catch (err) {
-        showToast('इमेज upload नहीं हुई। URL field में link paste करें।', 'error');
-        if (imgUploadLabel) {
-          imgUploadLabel.innerHTML = '<i class="fa-solid fa-image"></i> इमेज अपलोड करें <span class="img-upload-hint">(JPG, PNG, WEBP — max 5MB)</span>';
-          imgUploadLabel.style.pointerEvents = 'auto';
-        }
-        if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
-        if (el('anf-imgurl')) el('anf-imgurl').disabled = false;
-        uploadedImgData = null;
-      }
-    };
-  }
-
-  if (imgRemoveBtn) {
-    imgRemoveBtn.onclick = () => {
-      uploadedImgData = null;
-      if (imgFileInput) imgFileInput.value = '';
-      if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
-      if (imgUploadLabel) {
-        imgUploadLabel.innerHTML = '<i class="fa-solid fa-image"></i> इमेज अपलोड करें <span class="img-upload-hint">(JPG, PNG, WEBP — max 5MB)</span>';
-        imgUploadLabel.style.display = 'flex';
-        imgUploadLabel.style.pointerEvents = 'auto';
-      }
-      if (el('anf-imgurl')) { el('anf-imgurl').value = ''; el('anf-imgurl').disabled = false; }
-    };
-  }
-  // ---- END IMAGE UPLOAD HANDLER ----
-
-  // Add news form
-  const addNewsForm = el('admin-add-news-form');
-  if (addNewsForm) addNewsForm.onsubmit = (e) => {
-    e.preventDefault();
-    const title = el('anf-title')?.value?.trim();
-    const category = el('anf-category')?.value;
-    const readtime = el('anf-readtime')?.value?.trim() || '3 मिनट';
-    // Use uploaded image first, then URL field, then default
-    const imgurl = uploadedImgData || el('anf-imgurl')?.value?.trim() || '';
-    const summary = el('anf-summary')?.value?.trim();
-    const content = el('anf-content')?.value?.trim();
-    const featured = el('anf-featured')?.checked || false;
-    const breaking = el('anf-breaking')?.checked || false;
-
-    if (!title || !summary || !content) { showToast('कृपया सभी ज़रूरी फ़ील्ड भरें।', 'error'); return; }
-
-    const now = new Date();
-    const months = ['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
-    const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-
-    const newArticle = {
-      id: generateId(),
-      title, summary, content, category, readtime,
-      image: imgurl || defaultImg(category),
-      date: dateStr,
-      views: 0,
-      featured, breaking
-    };
-
-    if (db) {
-      if (featured) {
-        // Mark all other articles as not featured in Firebase
-        State.news.forEach(n => {
-          if (n.featured) {
-            db.ref('news/' + n.id + '/featured').set(false);
-          }
-        });
-      }
-      db.ref('news/' + newArticle.id).set(newArticle);
-    } else {
-      if (featured) State.news.forEach(n => n.featured = false);
-      State.news.unshift(newArticle);
-      State.save();
-      renderAll();
-    }
-
-    addNewsForm.reset();
-    // Reset image upload UI
-    uploadedImgData = null;
-    if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
-    if (imgUploadLabel) imgUploadLabel.style.display = 'flex';
-    if (el('anf-imgurl')) el('anf-imgurl').disabled = false;
-    showToast('समाचार सफलतापूर्वक प्रकाशित हुआ! 🎉');
-
-  };
-
-  // Poll edit form
-  const pollForm = el('admin-poll-form');
-  if (pollForm) pollForm.onsubmit = (e) => {
-    e.preventDefault();
-    const question = el('apf-question')?.value?.trim();
-    const opts = [
-      el('apf-opt1')?.value?.trim(),
-      el('apf-opt2')?.value?.trim(),
-      el('apf-opt3')?.value?.trim(),
-      el('apf-opt4')?.value?.trim()
-    ].filter(o => o);
-    if (!question || opts.length < 2) { showToast('कृपया प्रश्न और कम से कम 2 विकल्प डालें।', 'error'); return; }
-    
-    const newPoll = { question, options: opts, votes: opts.map(() => 0) };
-    
-    if (db) {
-      db.ref('poll').set(newPoll);
-      // Clear local voted status for new question
-      localStorage.removeItem('suchana_poll_voted_question');
-      State.poll.voted = false;
-    } else {
-      State.poll = { ...newPoll, voted: false };
-      State.save();
-      renderPoll();
-    }
-    showToast('नया पोल लाइव हो गया!');
-  };
-}
-
-/* ============================================================
-   ADMIN: NEWS LIST
-   ============================================================ */
-function renderAdminNewsList() {
-  const container = el('admin-news-list');
-  if (!container) return;
-  if (!State.news.length) { container.innerHTML = '<p style="color:var(--c-text-light);font-size:13px;">कोई समाचार नहीं।</p>'; return; }
-  container.innerHTML = State.news.map(art => `
-    <div class="admin-news-item" data-id="${art.id}">
-      <div>
-        <div class="ani-title">${art.title}</div>
-        <div class="ani-cat">${CAT_LABELS[art.category] || art.category} · ${art.date} · ${formatViews(art.views)} व्यूज़</div>
-      </div>
-      <button class="ani-del" data-id="${art.id}" title="हटाएं"><i class="fa-solid fa-trash-can"></i></button>
-    </div>
-  `).join('');
-  container.querySelectorAll('.ani-del').forEach(btn => {
-    btn.onclick = () => {
-      const id = parseInt(btn.dataset.id);
-      if (db) {
-        db.ref('news/' + id).remove();
-      } else {
-        State.news = State.news.filter(n => n.id !== id);
-        State.save();
-        renderAll();
-        renderAdminNewsList();
-      }
-      showToast('समाचार हटा दिया गया।');
-    };
-  });
-}
-
-/* ============================================================
    RENDER ALL
    ============================================================ */
 function renderAll() {
@@ -1091,7 +829,6 @@ function setupKeyboard() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeArticleModal();
-      if (el('admin-modal-backdrop')) el('admin-modal-backdrop').style.display = 'none';
       document.body.style.overflow = '';
       if (el('header-search-drop')) el('header-search-drop').classList.remove('open');
       if (el('off-canvas-overlay')) el('off-canvas-overlay').classList.remove('open');
@@ -1141,7 +878,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLoadMore();
   setupWeather();
   setupCitizenForm();
-  setupAdmin();
   setupCopyLink();
   setupKeyboard();
   setupStickyNav();

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>एडमिन डैशबोर्ड | सुचना छत्तीसगढ़</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Background Decor -->
+  <div class="decor-circle circle-1"></div>
+  <div class="decor-circle circle-2"></div>
+
+  <!-- Main Container -->
+  <main class="admin-container">
+    
+    <!-- ===== LOGIN PANEL ===== -->
+    <section class="admin-card login-card" id="admin-login-panel">
+      <div class="login-header">
+        <div class="logo-circle">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h1>सुचना छत्तीसगढ़</h1>
+        <p class="subtitle">एडमिन पोर्टल लॉगिन</p>
+      </div>
+      
+      <div class="form-group">
+        <label for="admin-pass-input"><i class="fa-solid fa-lock"></i> सुरक्षित पासवर्ड दर्ज करें</label>
+        <div class="input-wrap">
+          <input type="password" id="admin-pass-input" placeholder="पासवर्ड (Default: admin123)">
+          <button class="toggle-password" id="toggle-password-btn" type="button"><i class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>
+      
+      <button class="btn btn-primary btn-block" id="admin-login-btn">
+        लॉगिन करें <i class="fa-solid fa-right-to-bracket"></i>
+      </button>
+      
+      <div class="login-footer">
+        <a href="index.html"><i class="fa-solid fa-arrow-left"></i> मुख्य वेबसाइट पर जाएं</a>
+      </div>
+    </section>
+
+    <!-- ===== DASHBOARD PANEL (Hidden by Default) ===== -->
+    <section class="admin-card dash-card" id="admin-dash-panel" style="display: none;">
+      
+      <!-- Dash Header -->
+      <header class="dash-header">
+        <div class="dh-left">
+          <i class="fa-solid fa-gauge"></i>
+          <div>
+            <h2>एडमिन डैशबोर्ड</h2>
+            <p>सुचना छत्तीसगढ़ न्यूज़ पोर्टल</p>
+          </div>
+        </div>
+        <div class="dh-right">
+          <button class="btn btn-danger" id="admin-logout-btn">
+            लॉगआउट <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Tabs Menu -->
+      <nav class="dash-tabs">
+        <button class="tab-btn active" data-tab="add-news">
+          <i class="fa-solid fa-file-circle-plus"></i> + समाचार जोड़ें
+        </button>
+        <button class="tab-btn" data-tab="manage-news">
+          <i class="fa-solid fa-list-check"></i> समाचार सूची
+        </button>
+        <button class="tab-btn" data-tab="edit-poll">
+          <i class="fa-solid fa-square-poll-horizontal"></i> पोल बदलें
+        </button>
+        <button class="tab-btn" data-tab="citizen-reports">
+          <i class="fa-solid fa-bullhorn"></i> सिटीजन रिपोर्ट्स <span class="badge" id="report-badge">0</span>
+        </button>
+      </nav>
+
+      <!-- Tab 1: Add News Form -->
+      <div class="tab-content active" id="tab-add-news">
+        <form id="admin-add-news-form" class="admin-form">
+          <div class="form-group">
+            <label for="anf-title">समाचार शीर्षक *</label>
+            <input type="text" id="anf-title" placeholder="मुख्य शीर्षक दर्ज करें..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="anf-category">कैटेगरी (Category) *</label>
+              <select id="anf-category">
+                <option value="Chhattisgarh">छत्तीसगढ़</option>
+                <option value="JanjgirChampa">जांजगीर-चांपा</option>
+                <option value="Politics">राजनीति</option>
+                <option value="Crime">अपराध</option>
+                <option value="Business">व्यापार</option>
+                <option value="Sports">खेल-कूद</option>
+                <option value="Entertainment">मनोरंजन</option>
+                <option value="National">देश-विदेश</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="anf-readtime">पढ़ने का समय *</label>
+              <input type="text" id="anf-readtime" placeholder="जैसे: 3 मिनट" value="3 मिनट" required>
+            </div>
+          </div>
+
+          <!-- Image Upload Block -->
+          <div class="form-group img-upload-group">
+            <label>समाचार चित्र (Image) *</label>
+            
+            <div class="upload-dropzone">
+              <label for="anf-imgfile" class="zone-label" id="img-upload-label">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>चित्र अपलोड करें (JPG, PNG, WEBP — Max 5MB)</span>
+              </label>
+              <input type="file" id="anf-imgfile" accept="image/*" style="display: none;">
+              
+              <div class="preview-container" id="img-preview-wrap" style="display: none;">
+                <img id="img-preview" src="" alt="Preview">
+                <button type="button" class="btn-remove-img" id="img-remove-btn" title="हटाएं">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="text-separator"><span>अथवा</span></div>
+
+            <input type="text" id="anf-imgurl" placeholder="इमेज का डायरेक्ट URL पेस्ट करें...">
+          </div>
+
+          <div class="form-group">
+            <label for="anf-summary">संक्षिप्त विवरण (Summary) *</label>
+            <input type="text" id="anf-summary" placeholder="समाचार का छोटा सारांश (2-3 लाइन)..." required>
+          </div>
+
+          <div class="form-group">
+            <label for="anf-content">विस्तृत समाचार (Full Content) *</label>
+            <textarea id="anf-content" rows="8" placeholder="पूरा समाचार यहाँ लिखें..." required></textarea>
+          </div>
+
+          <div class="checkbox-row">
+            <label class="checkbox-container">
+              <input type="checkbox" id="anf-featured">
+              <span class="checkmark"></span>
+              मुख्य समाचार बनाएं (Featured)
+            </label>
+            <label class="checkbox-container">
+              <input type="checkbox" id="anf-breaking">
+              <span class="checkmark"></span>
+              ब्रेकिंग न्यूज़ में दिखाएं
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-large btn-block" id="btn-publish-news">
+            समाचार प्रकाशित करें <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 2: Manage News List -->
+      <div class="tab-content" id="tab-manage-news">
+        <div class="search-bar">
+          <input type="text" id="news-search-input" placeholder="शीर्षक या कैटेगरी से समाचार खोजें...">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
+        <div class="news-list-container" id="admin-news-list">
+          <div class="loading-state">
+            <i class="fa-solid fa-spinner fa-spin"></i> समाचार लोड हो रहे हैं...
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Edit Poll Form -->
+      <div class="tab-content" id="tab-edit-poll">
+        <form id="admin-poll-form" class="admin-form">
+          <div class="form-group">
+            <label for="apf-question">सर्वेक्षण प्रश्न (Poll Question) *</label>
+            <input type="text" id="apf-question" placeholder="जैसे: क्या आप नए विकास कार्यों से संतुष्ट हैं?" required>
+          </div>
+
+          <div class="form-group">
+            <label for="apf-opt1">विकल्प 1 *</label>
+            <input type="text" id="apf-opt1" value="हाँ, बिल्कुल" required>
+          </div>
+          <div class="form-group">
+            <label for="apf-opt2">विकल्प 2 *</label>
+            <input type="text" id="apf-opt2" value="नहीं" required>
+          </div>
+          <div class="form-group">
+            <label for="apf-opt3">विकल्प 3 (वैकल्पिक)</label>
+            <input type="text" id="apf-opt3" placeholder="जैसे: कुछ हद तक">
+          </div>
+          <div class="form-group">
+            <label for="apf-opt4">विकल्प 4 (वैकल्पिक)</label>
+            <input type="text" id="apf-opt4" placeholder="जैसे: कोई राय नहीं">
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-large btn-block">
+            नया पोल लाइव करें <i class="fa-solid fa-square-check"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 4: Citizen Reports List [NEW] -->
+      <div class="tab-content" id="tab-citizen-reports">
+        <div class="reports-container" id="admin-reports-list">
+          <div class="loading-state">
+            <i class="fa-solid fa-spinner fa-spin"></i> सिटीजन रिपोर्ट्स लोड हो रही हैं...
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toast-wrap"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
+  <!-- Application Script -->
+  <script src="admin.js"></script>
+</body>
+</html>

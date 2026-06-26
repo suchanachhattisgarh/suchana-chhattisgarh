@@ -58,7 +58,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body class="s-light">
 
@@ -358,7 +358,7 @@
           <li><a href="#">गोपनीयता नीति</a></li>
           <li><a href="#">विज्ञापन</a></li>
           <li><a href="#">सिटीजन पत्रकारिता</a></li>
-          <li><a href="#" id="admin-portal-link"><i class="fa-solid fa-user-shield"></i> एडमिन</a></li>
+          <li><a href="admin.html" target="_blank"><i class="fa-solid fa-user-shield"></i> एडमिन</a></li>
         </ul>
       </div>
 
@@ -396,97 +396,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- ===== ADMIN MODAL ===== -->
-  <div class="modal-backdrop" id="admin-modal-backdrop" style="display:none;">
-    <div class="article-modal admin-modal-box" style="max-width:900px;">
-      <button class="modal-close-btn" id="admin-modal-close"><i class="fa-solid fa-xmark"></i></button>
-
-      <div class="admin-header">
-        <h2><i class="fa-solid fa-user-shield"></i> एडमिन डैशबोर्ड — सुचना छत्तीसगढ़</h2>
-        <div id="admin-status-indicator"></div>
-      </div>
-
-      <!-- Login Form -->
-      <div id="admin-login-panel" class="admin-panel">
-        <h3>एडमिन लॉगिन</h3>
-        <p style="font-size:13px; color:#888; margin-bottom:14px;">डिफ़ॉल्ट पासवर्ड: <strong>admin123</strong></p>
-        <input type="password" id="admin-pass-input" class="admin-input" placeholder="पासवर्ड दर्ज करें">
-        <button class="admin-submit-btn" id="admin-login-btn">लॉगिन <i class="fa-solid fa-right-to-bracket"></i></button>
-      </div>
-
-      <!-- Dashboard Tabs -->
-      <div id="admin-dash-panel" class="admin-panel" style="display:none;">
-        <div class="admin-tab-row">
-          <button class="admin-tab active" data-tab="add-news">+ समाचार जोड़ें</button>
-          <button class="admin-tab" data-tab="manage-news">समाचार सूची</button>
-          <button class="admin-tab" data-tab="edit-poll">पोल बदलें</button>
-          <button class="admin-logout-btn" id="admin-logout-btn">लॉगआउट</button>
-        </div>
-
-        <!-- Tab: Add News -->
-        <div class="admin-tab-content active" id="tab-add-news">
-          <form id="admin-add-news-form" class="admin-form">
-            <input type="text" id="anf-title" placeholder="समाचार शीर्षक *" required>
-            <div class="admin-form-row">
-              <select id="anf-category">
-                <option value="Chhattisgarh">छत्तीसगढ़</option>
-                <option value="JanjgirChampa">जांजगीर-चांपा</option>
-                <option value="Politics">राजनीति</option>
-                <option value="Crime">अपराध</option>
-                <option value="Business">व्यापार</option>
-                <option value="Sports">खेल-कूद</option>
-                <option value="Entertainment">मनोरंजन</option>
-                <option value="National">देश-विदेश</option>
-              </select>
-              <input type="text" id="anf-readtime" placeholder="पढ़ने का समय (जैसे: 3 मिनट)" value="3 मिनट">
-            </div>
-            <!-- Image Upload Section -->
-            <div class="img-upload-section">
-              <label class="img-upload-label" for="anf-imgfile">
-                <i class="fa-solid fa-image"></i> इमेज अपलोड करें
-                <span class="img-upload-hint">(JPG, PNG, WEBP — max 2MB)</span>
-              </label>
-              <input type="file" id="anf-imgfile" accept="image/*" style="display:none;">
-              <div class="img-preview-wrap" id="img-preview-wrap" style="display:none;">
-                <img id="img-preview" src="" alt="Preview">
-                <button type="button" class="img-remove-btn" id="img-remove-btn" title="हटाएं">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-              <p class="img-upload-or">— या —</p>
-              <input type="text" id="anf-imgurl" placeholder="इमेज का URL paste करें (वैकल्पिक)">
-            </div>
-            <input type="text" id="anf-summary" placeholder="संक्षिप्त विवरण (Summary) *" required>
-            <textarea id="anf-content" rows="4" placeholder="विस्तृत समाचार (Full Content) *" required></textarea>
-            <div class="anf-checks">
-              <label><input type="checkbox" id="anf-featured"> मुख्य समाचार (Featured)</label>
-              <label><input type="checkbox" id="anf-breaking"> ब्रेकिंग न्यूज़</label>
-            </div>
-            <button type="submit" class="admin-submit-btn">प्रकाशित करें <i class="fa-solid fa-cloud-arrow-up"></i></button>
-          </form>
-        </div>
-
-        <!-- Tab: Manage News -->
-        <div class="admin-tab-content" id="tab-manage-news">
-          <div class="admin-news-list" id="admin-news-list"></div>
-        </div>
-
-        <!-- Tab: Edit Poll -->
-        <div class="admin-tab-content" id="tab-edit-poll">
-          <form id="admin-poll-form" class="admin-form">
-            <input type="text" id="apf-question" placeholder="पोल प्रश्न *" required>
-            <input type="text" id="apf-opt1" placeholder="विकल्प 1 *" value="हाँ, बिल्कुल" required>
-            <input type="text" id="apf-opt2" placeholder="विकल्प 2 *" value="नहीं" required>
-            <input type="text" id="apf-opt3" placeholder="विकल्प 3 (वैकल्पिक)" value="तटस्थ">
-            <input type="text" id="apf-opt4" placeholder="विकल्प 4 (वैकल्पिक)" value="कोई राय नहीं">
-            <button type="submit" class="admin-submit-btn">नया पोल लाइव करें <i class="fa-solid fa-check"></i></button>
-          </form>
-        </div>
-      </div>
-
-    </div>
-  </div>
 
   <!-- Firebase Compatibility SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
