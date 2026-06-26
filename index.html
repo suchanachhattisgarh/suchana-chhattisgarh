@@ -381,7 +381,22 @@
               </select>
               <input type="text" id="anf-readtime" placeholder="पढ़ने का समय (जैसे: 3 मिनट)" value="3 मिनट">
             </div>
-            <input type="text" id="anf-imgurl" placeholder="इमेज URL (खाली छोड़ें = डिफ़ॉल्ट)">
+            <!-- Image Upload Section -->
+            <div class="img-upload-section">
+              <label class="img-upload-label" for="anf-imgfile">
+                <i class="fa-solid fa-image"></i> इमेज अपलोड करें
+                <span class="img-upload-hint">(JPG, PNG, WEBP — max 2MB)</span>
+              </label>
+              <input type="file" id="anf-imgfile" accept="image/*" style="display:none;">
+              <div class="img-preview-wrap" id="img-preview-wrap" style="display:none;">
+                <img id="img-preview" src="" alt="Preview">
+                <button type="button" class="img-remove-btn" id="img-remove-btn" title="हटाएं">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <p class="img-upload-or">— या —</p>
+              <input type="text" id="anf-imgurl" placeholder="इमेज का URL paste करें (वैकल्पिक)">
+            </div>
             <input type="text" id="anf-summary" placeholder="संक्षिप्त विवरण (Summary) *" required>
             <textarea id="anf-content" rows="4" placeholder="विस्तृत समाचार (Full Content) *" required></textarea>
             <div class="anf-checks">

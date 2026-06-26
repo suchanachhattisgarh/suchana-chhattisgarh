@@ -1087,3 +1087,73 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   .top-bar-right { gap: 6px; }
   .soc-link { width: 24px; height: 24px; font-size: 11px; }
 }
+
+/* ============================================================
+   IMAGE UPLOAD SECTION (Admin Panel)
+   ============================================================ */
+.img-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.img-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 2px dashed var(--c-main);
+  border-radius: 6px;
+  background: rgba(171,1,0,0.04);
+  color: var(--c-main);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.img-upload-label:hover {
+  background: rgba(171,1,0,0.1);
+  border-style: solid;
+}
+.img-upload-label i { font-size: 22px; }
+.img-upload-hint {
+  font-size: 11px;
+  color: var(--c-text-light);
+  font-weight: 400;
+  display: block;
+  text-align: center;
+  margin-top: 2px;
+}
+.img-preview-wrap {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  max-height: 180px;
+}
+.img-preview-wrap img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.img-remove-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 28px; height: 28px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: background var(--transition);
+}
+.img-remove-btn:hover { background: var(--c-main); }
+.img-upload-or {
+  text-align: center;
+  font-size: 12px;
+  color: var(--c-text-light);
+  margin: 0;
+}

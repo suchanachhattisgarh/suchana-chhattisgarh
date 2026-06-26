@@ -762,6 +762,96 @@ function setupAdmin() {
     };
   });
 
+  // ---- IMAGE UPLOAD HANDLER ----
+  let uploadedImgData = null; // stores base64 string of uploaded image
+
+  const imgFileInput = el('anf-imgfile');
+  const imgPreviewWrap = el('img-preview-wrap');
+  const imgPreview = el('img-preview');
+  const imgRemoveBtn = el('img-remove-btn');
+  const imgUploadLabel = document.querySelector('.img-upload-label');
+
+  const IMGBB_API_KEY = '5368bd0e8283baec2685b3029510756e';
+
+  if (imgFileInput) {
+    imgFileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Size check: max 5MB for imgBB
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('इमेज 5MB से छोटी होनी चाहिए!', 'error');
+        imgFileInput.value = '';
+        return;
+      }
+
+      // Show loading state
+      if (imgUploadLabel) {
+        imgUploadLabel.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> अपलोड हो रही है...';
+        imgUploadLabel.style.pointerEvents = 'none';
+      }
+
+      try {
+        // Convert to base64 first for preview
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result.split(',')[1]);
+          reader.readAsDataURL(file);
+        });
+
+        // Show preview immediately
+        if (imgPreview) imgPreview.src = 'data:image/jpeg;base64,' + base64;
+        if (imgPreviewWrap) imgPreviewWrap.style.display = 'block';
+
+        // Upload to ImgBB
+        const formData = new FormData();
+        formData.append('key', IMGBB_API_KEY);
+        formData.append('image', base64);
+
+        const response = await fetch('https://api.imgbb.com/1/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          uploadedImgData = result.data.url; // public URL from imgBB
+          if (imgPreview) imgPreview.src = uploadedImgData;
+          if (el('anf-imgurl')) { el('anf-imgurl').value = uploadedImgData; el('anf-imgurl').disabled = true; }
+          if (imgUploadLabel) imgUploadLabel.style.display = 'none';
+          showToast('इमेज ImgBB पर upload हो गई! ✅ सबको दिखेगी!');
+        } else {
+          throw new Error('Upload failed');
+        }
+
+      } catch (err) {
+        showToast('इमेज upload नहीं हुई। URL field में link paste करें।', 'error');
+        if (imgUploadLabel) {
+          imgUploadLabel.innerHTML = '<i class="fa-solid fa-image"></i> इमेज अपलोड करें <span class="img-upload-hint">(JPG, PNG, WEBP — max 5MB)</span>';
+          imgUploadLabel.style.pointerEvents = 'auto';
+        }
+        if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
+        if (el('anf-imgurl')) el('anf-imgurl').disabled = false;
+        uploadedImgData = null;
+      }
+    };
+  }
+
+  if (imgRemoveBtn) {
+    imgRemoveBtn.onclick = () => {
+      uploadedImgData = null;
+      if (imgFileInput) imgFileInput.value = '';
+      if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
+      if (imgUploadLabel) {
+        imgUploadLabel.innerHTML = '<i class="fa-solid fa-image"></i> इमेज अपलोड करें <span class="img-upload-hint">(JPG, PNG, WEBP — max 5MB)</span>';
+        imgUploadLabel.style.display = 'flex';
+        imgUploadLabel.style.pointerEvents = 'auto';
+      }
+      if (el('anf-imgurl')) { el('anf-imgurl').value = ''; el('anf-imgurl').disabled = false; }
+    };
+  }
+  // ---- END IMAGE UPLOAD HANDLER ----
+
   // Add news form
   const addNewsForm = el('admin-add-news-form');
   if (addNewsForm) addNewsForm.onsubmit = (e) => {
@@ -769,7 +859,8 @@ function setupAdmin() {
     const title = el('anf-title')?.value?.trim();
     const category = el('anf-category')?.value;
     const readtime = el('anf-readtime')?.value?.trim() || '3 मिनट';
-    const imgurl = el('anf-imgurl')?.value?.trim() || '';
+    // Use uploaded image first, then URL field, then default
+    const imgurl = uploadedImgData || el('anf-imgurl')?.value?.trim() || '';
     const summary = el('anf-summary')?.value?.trim();
     const content = el('anf-content')?.value?.trim();
     const featured = el('anf-featured')?.checked || false;
@@ -794,7 +885,13 @@ function setupAdmin() {
     State.save();
     renderAll();
     addNewsForm.reset();
-    showToast('समाचार सफलतापूर्वक प्रकाशित हुआ!');
+    // Reset image upload UI
+    uploadedImgData = null;
+    if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
+    if (imgUploadLabel) imgUploadLabel.style.display = 'flex';
+    if (el('anf-imgurl')) el('anf-imgurl').disabled = false;
+    showToast('समाचार सफलतापूर्वक प्रकाशित हुआ! 🎉');
+
   };
 
   // Poll edit form
