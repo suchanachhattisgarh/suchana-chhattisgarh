@@ -235,9 +235,9 @@ const State = {
   load() {
     // 1. Local storage cache for instant offline load
     const stored = localStorage.getItem('suchana_news');
-    this.news = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_NEWS));
+    State.news = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_NEWS));
     const storedPoll = localStorage.getItem('suchana_poll');
-    this.poll = storedPoll ? JSON.parse(storedPoll) : JSON.parse(JSON.stringify(DEFAULT_POLL));
+    State.poll = storedPoll ? JSON.parse(storedPoll) : JSON.parse(JSON.stringify(DEFAULT_POLL));
 
     // 2. Setup Firebase Real-time listeners
     if (db) {
@@ -252,7 +252,7 @@ const State = {
             newsArray = Object.values(data);
           }
           newsArray.sort((a, b) => b.id - a.id);
-          this.news = newsArray;
+          State.news = newsArray;
         } else {
           // If database is empty, seed it with DEFAULT_NEWS
           const seedData = {};
@@ -260,35 +260,41 @@ const State = {
             seedData[art.id] = art;
           });
           db.ref('news').set(seedData);
-          this.news = JSON.parse(JSON.stringify(DEFAULT_NEWS));
+          State.news = JSON.parse(JSON.stringify(DEFAULT_NEWS));
         }
 
         // Cache locally
-        localStorage.setItem('suchana_news', JSON.stringify(this.news));
+        localStorage.setItem('suchana_news', JSON.stringify(State.news));
 
         // Re-render UI components
         renderAll();
-        if (this.adminLoggedIn) renderAdminNewsList();
+        if (State.adminLoggedIn) renderAdminNewsList();
+      }, (error) => {
+        console.error("Firebase News Sync Error:", error);
+        showToast("डेटाबेस एरर (News): " + error.message, "error");
       });
 
       // Poll listener
       db.ref('poll').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          this.poll = data;
+          State.poll = data;
           const localPollVoted = localStorage.getItem('suchana_poll_voted_question');
-          this.poll.voted = (localPollVoted === this.poll.question);
+          State.poll.voted = (localPollVoted === State.poll.question);
         } else {
           // Seed DEFAULT_POLL
           db.ref('poll').set(DEFAULT_POLL);
-          this.poll = JSON.parse(JSON.stringify(DEFAULT_POLL));
+          State.poll = JSON.parse(JSON.stringify(DEFAULT_POLL));
         }
 
         // Cache locally
-        localStorage.setItem('suchana_poll', JSON.stringify(this.poll));
+        localStorage.setItem('suchana_poll', JSON.stringify(State.poll));
 
         // Render poll
         renderPoll();
+      }, (error) => {
+        console.error("Firebase Poll Sync Error:", error);
+        showToast("डेटाबेस एरर (Poll): " + error.message, "error");
       });
     }
   },
