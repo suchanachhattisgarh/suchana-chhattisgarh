@@ -1073,7 +1073,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   .footer-top { grid-template-columns: 1fr; gap: 24px; padding: 30px var(--wrap-pad); }
   .footer-bottom .wrap { flex-direction: column; text-align: center; }
   .block-head-wrap { flex-direction: column; align-items: flex-start; }
-  .site-logo { height: 55px; max-width: 200px; }
+  .site-logo { height: 72px; max-width: 250px; }
   .main-menu a { padding: 12px 10px; font-size: 12px; }
   .bh-title { font-size: 17px; }
   .admin-form-row { grid-template-columns: 1fr; }

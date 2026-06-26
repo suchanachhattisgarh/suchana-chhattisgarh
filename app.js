@@ -10,12 +10,14 @@
    FIREBASE REALTIME DATABASE INITIALIZATION
    ============================================================ */
 const firebaseConfig = {
-  databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com/"
+  databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com"
 };
 
 // Initialize Firebase
 if (typeof firebase !== 'undefined') {
   firebase.initializeApp(firebaseConfig);
+  // Enable debug logging for Firebase database connections
+  firebase.database.enableLogging(true);
 } else {
   console.error("Firebase SDK not loaded.");
   setTimeout(() => {

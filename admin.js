@@ -7,26 +7,65 @@
 
 // 1. Firebase Configuration & Initialization
 const firebaseConfig = {
-  databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com/"
+  databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com"
 };
 
 if (typeof firebase !== 'undefined') {
   firebase.initializeApp(firebaseConfig);
+  // Enable debug logging for Firebase database connections
+  firebase.database.enableLogging(true);
 } else {
   console.error("Firebase SDK not loaded.");
   alert("डेटाबेस कनेक्शन एरर: Firebase SDK लोड नहीं हुआ। कृपया इंटरनेट चेक करें या एड-ब्लॉकर बंद करें।");
 }
 const db = typeof firebase !== 'undefined' ? firebase.database() : null;
 
-const IMGBB_API_KEY = '5368bd0e8283baec2685b3029510756e';
+// UI Connection status update
+function updateConnectionStatusUI(status) {
+  const badge = el('db-status-badge');
+  if (!badge) return;
+  const dot = badge.querySelector('.dot');
+  const text = badge.querySelector('.status-text');
+  if (!dot || !text) return;
+
+  if (status === 'online') {
+    dot.className = 'dot dot-online';
+    text.textContent = 'डेटाबेस: सक्रिय';
+    badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+  } else if (status === 'offline') {
+    dot.className = 'dot dot-offline';
+    text.textContent = 'डेटाबेस: ऑफलाइन';
+    badge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+  } else {
+    dot.className = 'dot dot-connecting';
+    text.textContent = 'डेटाबेस: कनेक्ट हो रहा है...';
+    badge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+  }
+}
 
 // 2. State Management
 const State = {
   adminLoggedIn: localStorage.getItem('suchana_admin_logged_in') === 'true',
+  dbConnected: false,
   news: [],
   reports: [],
   poll: {}
 };
+
+// Start connection monitoring immediately
+if (db) {
+  db.ref(".info/connected").on("value", (snap) => {
+    if (snap.val() === true) {
+      State.dbConnected = true;
+      updateConnectionStatusUI('online');
+    } else {
+      State.dbConnected = false;
+      updateConnectionStatusUI('offline');
+    }
+  });
+}
+
+const IMGBB_API_KEY = '5368bd0e8283baec2685b3029510756e';
 
 // Category Labels mapping
 const CAT_LABELS = {
@@ -314,6 +353,10 @@ function setupNewsForm() {
   form.onsubmit = (e) => {
     e.preventDefault();
     if (!db) { showToast("डेटाबेस कनेक्शन सक्रिय नहीं है!", "error"); return; }
+    if (!State.dbConnected) {
+      showToast("डेटाबेस ऑफ़लाइन है! कृपया इंटरनेट कनेक्शन चेक करें और डेटाबेस सक्रिय होने की प्रतीक्षा करें।", "error");
+      return;
+    }
 
     const title = el('anf-title')?.value?.trim();
     const category = el('anf-category')?.value;
@@ -429,6 +472,10 @@ function renderNewsList() {
   // Handle news item delete button
   container.querySelectorAll('.btn-del-news').forEach(btn => {
     btn.onclick = () => {
+      if (!State.dbConnected) {
+        showToast("डेटाबेस ऑफ़लाइन है! कृपया इंटरनेट कनेक्शन चेक करें।", "error");
+        return;
+      }
       const id = btn.dataset.id;
       if (!confirm("क्या आप सचमुच इस समाचार को स्थायी रूप से डिलीट करना चाहते हैं?")) return;
 
@@ -460,6 +507,10 @@ function setupPollForm() {
   form.onsubmit = (e) => {
     e.preventDefault();
     if (!db) { showToast("डेटाबेस कनेक्शन सक्रिय नहीं है!", "error"); return; }
+    if (!State.dbConnected) {
+      showToast("डेटाबेस ऑफ़लाइन है! कृपया इंटरनेट कनेक्शन चेक करें और डेटाबेस सक्रिय होने की प्रतीक्षा करें।", "error");
+      return;
+    }
 
     const question = el('apf-question')?.value?.trim();
     const opts = [
@@ -524,6 +575,10 @@ function renderReportsList() {
   // Delete citizen reports
   container.querySelectorAll('.btn-del-report').forEach(btn => {
     btn.onclick = () => {
+      if (!State.dbConnected) {
+        showToast("डेटाबेस ऑफ़लाइन है! कृपया इंटरनेट कनेक्शन चेक करें।", "error");
+        return;
+      }
       const key = btn.dataset.key;
       if (!confirm("क्या आप इस रिपोर्ट को डिलीट करना चाहते हैं?")) return;
 

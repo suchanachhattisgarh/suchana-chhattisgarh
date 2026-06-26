@@ -263,6 +263,53 @@ textarea:focus {
   color: var(--c-text-sec);
 }
 
+.dh-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.db-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.db-status-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.db-status-badge .dot.dot-online {
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: db-pulse 2s infinite;
+}
+
+.db-status-badge .dot.dot-offline {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.db-status-badge .dot.dot-connecting {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: db-pulse 1s infinite;
+}
+
+@keyframes db-pulse {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
 /* Tabs Navigation */
 .dash-tabs {
   display: flex;
