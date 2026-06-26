@@ -7,6 +7,19 @@
 'use strict';
 
 /* ============================================================
+   FIREBASE REALTIME DATABASE INITIALIZATION
+   ============================================================ */
+const firebaseConfig = {
+  databaseURL: "https://suchana-chhattisgarh-default-rtdb.firebaseio.com/"
+};
+// Initialize Firebase
+if (typeof firebase !== 'undefined') {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = typeof firebase !== 'undefined' ? firebase.database() : null;
+
+
+/* ============================================================
    SAMPLE NEWS DATABASE (Static - editable via Admin Panel)
    ============================================================ */
 const DEFAULT_NEWS = [
@@ -220,12 +233,67 @@ const State = {
   adminLoggedIn: false,
 
   load() {
+    // 1. Local storage cache for instant offline load
     const stored = localStorage.getItem('suchana_news');
     this.news = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_NEWS));
     const storedPoll = localStorage.getItem('suchana_poll');
     this.poll = storedPoll ? JSON.parse(storedPoll) : JSON.parse(JSON.stringify(DEFAULT_POLL));
+
+    // 2. Setup Firebase Real-time listeners
+    if (db) {
+      // News listener
+      db.ref('news').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          let newsArray = [];
+          if (Array.isArray(data)) {
+            newsArray = data.filter(item => item !== null);
+          } else if (typeof data === 'object') {
+            newsArray = Object.values(data);
+          }
+          newsArray.sort((a, b) => b.id - a.id);
+          this.news = newsArray;
+        } else {
+          // If database is empty, seed it with DEFAULT_NEWS
+          const seedData = {};
+          DEFAULT_NEWS.forEach(art => {
+            seedData[art.id] = art;
+          });
+          db.ref('news').set(seedData);
+          this.news = JSON.parse(JSON.stringify(DEFAULT_NEWS));
+        }
+
+        // Cache locally
+        localStorage.setItem('suchana_news', JSON.stringify(this.news));
+
+        // Re-render UI components
+        renderAll();
+        if (this.adminLoggedIn) renderAdminNewsList();
+      });
+
+      // Poll listener
+      db.ref('poll').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          this.poll = data;
+          const localPollVoted = localStorage.getItem('suchana_poll_voted_question');
+          this.poll.voted = (localPollVoted === this.poll.question);
+        } else {
+          // Seed DEFAULT_POLL
+          db.ref('poll').set(DEFAULT_POLL);
+          this.poll = JSON.parse(JSON.stringify(DEFAULT_POLL));
+        }
+
+        // Cache locally
+        localStorage.setItem('suchana_poll', JSON.stringify(this.poll));
+
+        // Render poll
+        renderPoll();
+      });
+    }
   },
   save() {
+    // Keep local storage cache updated
     localStorage.setItem('suchana_news', JSON.stringify(this.news));
     localStorage.setItem('suchana_poll', JSON.stringify(this.poll));
   },
@@ -457,9 +525,18 @@ function renderPoll() {
     container.querySelectorAll('.poll-opt-btn').forEach(btn => {
       btn.onclick = () => {
         const idx = parseInt(btn.dataset.index);
+        
+        // Save vote to Firebase transactionally
+        if (db) {
+          db.ref('poll/votes/' + idx).transaction((currentVotes) => {
+            return (currentVotes || 0) + 1;
+          });
+        }
+        
         p.votes[idx]++;
         p.voted = true;
-        State.save();
+        localStorage.setItem('suchana_poll_voted_question', p.question);
+        
         renderPoll();
         showToast('आपका वोट दर्ज हो गया! धन्यवाद।');
       };
@@ -489,8 +566,14 @@ function renderWeather(city = 'Raipur') {
 function openArticleModal(id) {
   const art = State.news.find(n => n.id === id);
   if (!art) return;
+  
+  // Increment view in Firebase
+  if (db) {
+    db.ref('news/' + id + '/views').transaction((currentViews) => {
+      return (currentViews || 0) + 1;
+    });
+  }
   art.views++;
-  State.save();
 
   if (el('modal-img')) { el('modal-img').src = art.image || defaultImg(art.category); el('modal-img').alt = art.title; }
   if (el('modal-cat-badge')) el('modal-cat-badge').textContent = CAT_LABELS[art.category] || art.category;
@@ -694,9 +777,20 @@ function setupCitizenForm() {
     if (!name || !location || !headline) { showToast('कृपया सभी ज़रूरी फ़ील्ड भरें।', 'error'); return; }
     showToast(`${name} जी, आपकी रिपोर्ट भेज दी गई! हम जल्द संपर्क करेंगे।`);
     form.reset();
+    // Store in Firebase
+    const reportData = {
+      name,
+      location,
+      headline,
+      detail: data.get('detail') || '',
+      date: new Date().toLocaleDateString('hi-IN')
+    };
+    if (db) {
+      db.ref('reports').push(reportData);
+    }
     // Store in localStorage for admin view
     const reports = JSON.parse(localStorage.getItem('suchana_reports') || '[]');
-    reports.unshift({ name, location, headline, detail: data.get('detail'), date: new Date().toLocaleDateString('hi-IN') });
+    reports.unshift(reportData);
     localStorage.setItem('suchana_reports', JSON.stringify(reports));
   };
 }
@@ -873,18 +967,32 @@ function setupAdmin() {
     const months = ['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
     const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 
-    if (featured) State.news.forEach(n => n.featured = false);
-
-    State.news.unshift({
+    const newArticle = {
       id: generateId(),
       title, summary, content, category, readtime,
       image: imgurl || defaultImg(category),
       date: dateStr,
       views: 0,
       featured, breaking
-    });
-    State.save();
-    renderAll();
+    };
+
+    if (db) {
+      if (featured) {
+        // Mark all other articles as not featured in Firebase
+        State.news.forEach(n => {
+          if (n.featured) {
+            db.ref('news/' + n.id + '/featured').set(false);
+          }
+        });
+      }
+      db.ref('news/' + newArticle.id).set(newArticle);
+    } else {
+      if (featured) State.news.forEach(n => n.featured = false);
+      State.news.unshift(newArticle);
+      State.save();
+      renderAll();
+    }
+
     addNewsForm.reset();
     // Reset image upload UI
     uploadedImgData = null;
@@ -907,9 +1015,19 @@ function setupAdmin() {
       el('apf-opt4')?.value?.trim()
     ].filter(o => o);
     if (!question || opts.length < 2) { showToast('कृपया प्रश्न और कम से कम 2 विकल्प डालें।', 'error'); return; }
-    State.poll = { question, options: opts, votes: opts.map(() => 0), voted: false };
-    State.save();
-    renderPoll();
+    
+    const newPoll = { question, options: opts, votes: opts.map(() => 0) };
+    
+    if (db) {
+      db.ref('poll').set(newPoll);
+      // Clear local voted status for new question
+      localStorage.removeItem('suchana_poll_voted_question');
+      State.poll.voted = false;
+    } else {
+      State.poll = { ...newPoll, voted: false };
+      State.save();
+      renderPoll();
+    }
     showToast('नया पोल लाइव हो गया!');
   };
 }
@@ -933,10 +1051,14 @@ function renderAdminNewsList() {
   container.querySelectorAll('.ani-del').forEach(btn => {
     btn.onclick = () => {
       const id = parseInt(btn.dataset.id);
-      State.news = State.news.filter(n => n.id !== id);
-      State.save();
-      renderAll();
-      renderAdminNewsList();
+      if (db) {
+        db.ref('news/' + id).remove();
+      } else {
+        State.news = State.news.filter(n => n.id !== id);
+        State.save();
+        renderAll();
+        renderAdminNewsList();
+      }
       showToast('समाचार हटा दिया गया।');
     };
   });

@@ -143,8 +143,8 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
 }
 .smart-head-mid .inner {
   justify-content: space-between;
-  padding-top: 18px;
-  padding-bottom: 18px;
+  padding-top: 6px;
+  padding-bottom: 6px;
   flex-wrap: wrap;
 }
 .head-left, .head-right {
@@ -176,9 +176,9 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
 .logo-link { display: block; }
 .logo-wrap { text-align: center; }
 .site-logo {
-  height: 85px;
+  height: 105px;
   width: auto;
-  max-width: 420px;
+  max-width: 580px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
