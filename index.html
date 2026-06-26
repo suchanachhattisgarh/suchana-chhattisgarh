@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>सुचना छत्तीसगढ़ | Suchana Chhattisgarh - ताज़ा खबरें</title>
+  <meta name="description" content="सुचना छत्तीसगढ़ - छत्तीसगढ़ की सबसे तेज़, विश्वसनीय और निष्पक्ष खबरें। रायपुर, बिलासपुर, बस्तर से ताज़ा समाचार।">
+  <meta name="keywords" content="सुचना छत्तीसगढ़, Chhattisgarh news, रायपुर, छत्तीसगढ़ समाचार, hindi news">
+  <meta property="og:title" content="सुचना छत्तीसगढ़ - ताज़ा खबरें">
+  <meta property="og:description" content="छत्तीसगढ़ की सबसे तेज़ और विश्वसनीय खबरें">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://suchanachhattisgarh.netlify.app/">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="s-light">
+
+  <!-- ===== TOP BAR (Social Links + Dark/Light toggle) ===== -->
+  <div class="smart-head-top-bar" id="top-bar">
+    <div class="wrap inner">
+      <div class="top-bar-left">
+        <span class="top-date" id="top-date-display">शुक्रवार, 26 जून 2026</span>
+      </div>
+      <div class="top-bar-right">
+        <div class="social-icons-row">
+          <a href="#" class="soc-link soc-fb" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="soc-link soc-yt" aria-label="YouTube" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="soc-link soc-ig" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="soc-link soc-wa" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#" class="soc-link soc-tg" aria-label="Telegram" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+        </div>
+        <button class="scheme-toggle" id="scheme-toggle" title="थीम बदलें">
+          <i class="fa-solid fa-moon" id="toggle-icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN HEADER (Logo Center) ===== -->
+  <header class="smart-head-mid" id="main-header">
+    <div class="wrap inner">
+      <div class="head-left">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="head-date-inline" id="header-date-inline">शुक्रवार, 26 जून</span>
+      </div>
+
+      <div class="head-center">
+        <a href="index.html" class="logo-link" title="सुचना छत्तीसगढ़" rel="home">
+          <div class="logo-wrap">
+            <img src="assets/logo.jpeg" alt="सुचना छत्तीसगढ़" class="site-logo" id="site-logo" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='block';">
+            <div class="logo-text-fallback" id="logo-text" style="display:none;">
+              <span class="lt-suchana">सुचना</span>
+              <span class="lt-cg">छत्तीसगढ़</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="head-right">
+        <button class="header-search-btn" id="header-search-toggle" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Dropdown -->
+    <div class="header-search-drop" id="header-search-drop">
+      <div class="wrap">
+        <div class="search-input-wrap">
+          <input type="text" id="search-input-main" placeholder="खबरें खोजें... जैसे: रायपुर, बजट, चुनाव">
+          <button id="search-submit-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== NAVIGATION BAR (Dark) ===== -->
+  <nav class="navigation-main" id="nav-main">
+    <div class="wrap inner">
+      <ul class="main-menu" id="main-menu">
+        <li><a href="#" class="active" data-cat="All"><i class="fa-solid fa-house"></i> होम</a></li>
+        <li><a href="#" data-cat="Chhattisgarh">छत्तीसगढ़</a></li>
+        <li><a href="#" data-cat="Politics">राजनीति</a></li>
+        <li><a href="#" data-cat="Crime">अपराध</a></li>
+        <li><a href="#" data-cat="Business">व्यापार</a></li>
+        <li><a href="#" data-cat="Sports">खेल-कूद</a></li>
+        <li><a href="#" data-cat="Entertainment">मनोरंजन</a></li>
+        <li><a href="#" data-cat="National">देश-विदेश</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Mobile Off-Canvas Menu -->
+  <div class="off-canvas-overlay" id="off-canvas-overlay"></div>
+  <div class="off-canvas-menu" id="off-canvas-menu">
+    <div class="ofc-head">
+      <span class="ofc-title">सुचना छत्तीसगढ़</span>
+      <button class="ofc-close" id="ofc-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="ofc-nav-list">
+      <li><a href="#" data-cat="All"><i class="fa-solid fa-house"></i> होम</a></li>
+      <li><a href="#" data-cat="Chhattisgarh"><i class="fa-solid fa-map-location-dot"></i> छत्तीसगढ़</a></li>
+      <li><a href="#" data-cat="Politics"><i class="fa-solid fa-landmark"></i> राजनीति</a></li>
+      <li><a href="#" data-cat="Crime"><i class="fa-solid fa-shield-halved"></i> अपराध</a></li>
+      <li><a href="#" data-cat="Business"><i class="fa-solid fa-chart-line"></i> व्यापार</a></li>
+      <li><a href="#" data-cat="Sports"><i class="fa-solid fa-trophy"></i> खेल-कूद</a></li>
+      <li><a href="#" data-cat="Entertainment"><i class="fa-solid fa-film"></i> मनोरंजन</a></li>
+      <li><a href="#" data-cat="National"><i class="fa-solid fa-globe"></i> देश-विदेश</a></li>
+    </ul>
+  </div>
+
+  <!-- ===== BREAKING NEWS TICKER ===== -->
+  <div class="breaking-bar" id="breaking-bar">
+    <div class="breaking-label"><i class="fa-solid fa-bolt"></i> ब्रेकिंग</div>
+    <div class="breaking-ticker-wrap">
+      <div class="breaking-ticker-inner" id="breaking-ticker-inner">
+        <span>लोड हो रहा है... छत्तीसगढ़ की ताज़ा ख़बरें सीधे आप तक...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN SITE CONTENT ===== -->
+  <main class="site-main wrap">
+
+    <!-- ===== HERO SECTION: FEATURED + SIDEBAR ===== -->
+    <section class="hero-section" id="hero-section">
+      <div class="hero-grid">
+
+        <!-- Featured Big Post -->
+        <div class="hero-featured" id="hero-featured">
+          <!-- dynamically populated -->
+          <div class="loading-shimmer" style="height:460px; border-radius:8px;"></div>
+        </div>
+
+        <!-- Hero Right: 4 small posts stack -->
+        <div class="hero-right-stack" id="hero-right-stack">
+          <!-- dynamically populated -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION DIVIDER: TICKER CATEGORY HEADER ===== -->
+    <div class="block-head-wrap">
+      <div class="block-head">
+        <span class="bh-bar"></span>
+        <h2 class="bh-title" id="section-cat-label">ताज़ा समाचार</h2>
+      </div>
+      <div class="cat-filter-pills" id="cat-filter-pills">
+        <button class="pill active" data-cat="All">सभी</button>
+        <button class="pill" data-cat="Chhattisgarh">छत्तीसगढ़</button>
+        <button class="pill" data-cat="Politics">राजनीति</button>
+        <button class="pill" data-cat="Crime">अपराध</button>
+        <button class="pill" data-cat="Business">व्यापार</button>
+        <button class="pill" data-cat="Sports">खेल</button>
+        <button class="pill" data-cat="Entertainment">मनोरंजन</button>
+        <button class="pill" data-cat="National">देश-विदेश</button>
+      </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT + SIDEBAR ===== -->
+    <div class="content-sidebar-layout">
+
+      <!-- Main News Grid -->
+      <div class="main-col">
+        <div class="news-grid-loop" id="news-grid-loop">
+          <!-- dynamically populated -->
+        </div>
+        <div class="load-more-wrap">
+          <button class="load-more-btn" id="load-more-btn">और खबरें लोड करें <i class="fa-solid fa-chevron-down"></i></button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar-col">
+
+        <!-- What's Hot Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-head"><span class="wh-bar"></span><h3>ट्रेंडिंग</h3></div>
+          <div class="trending-loop" id="trending-loop">
+            <!-- dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Poll Widget -->
+        <div class="sidebar-widget poll-widget" id="poll-widget-section">
+          <div class="widget-head"><span class="wh-bar"></span><h3>जनमत सर्वेक्षण</h3></div>
+          <p class="poll-q" id="poll-question">क्या रायपुर में मेट्रो परियोजना से शहर का विकास होगा?</p>
+          <div class="poll-opts" id="poll-opts"></div>
+          <p class="poll-total" id="poll-total">कुल वोट: 0</p>
+        </div>
+
+        <!-- Weather Widget -->
+        <div class="sidebar-widget weather-widget-side">
+          <div class="widget-head"><span class="wh-bar"></span><h3>छत्तीसगढ़ मौसम</h3></div>
+          <div class="weather-side-body">
+            <div class="ws-top">
+              <i class="fa-solid fa-cloud-sun ws-icon" id="ws-icon"></i>
+              <div>
+                <div class="ws-temp" id="ws-temp">32°C</div>
+                <div class="ws-city" id="ws-city">रायपुर</div>
+              </div>
+            </div>
+            <div class="ws-details">
+              <div class="ws-row"><span>हालत</span><span id="ws-desc">आंशिक बादल</span></div>
+              <div class="ws-row"><span>आर्द्रता</span><span id="ws-hum">64%</span></div>
+              <div class="ws-row"><span>हवा</span><span id="ws-wind">14 km/h</span></div>
+            </div>
+            <select class="city-select" id="city-select">
+              <option value="Raipur">रायपुर</option>
+              <option value="Bilaspur">बिलासपुर</option>
+              <option value="Durg">दुर्ग-भिलाई</option>
+              <option value="Bastar">बस्तर</option>
+              <option value="Surguja">सरगुजा</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Citizen Reporter Widget -->
+        <div class="sidebar-widget citizen-widget">
+          <div class="widget-head"><span class="wh-bar"></span><h3>आपकी खबर भेजें</h3></div>
+          <p class="citizen-sub">अपने आस-पास की जनसमस्या या घटना की जानकारी हमें भेजें।</p>
+          <form class="citizen-form" id="citizen-form">
+            <input type="text" name="name" placeholder="आपका नाम *" required>
+            <input type="text" name="location" placeholder="स्थान (शहर/गांव) *" required>
+            <input type="text" name="headline" placeholder="खबर की मुख्य सुर्खी *" required>
+            <textarea name="detail" placeholder="विस्तृत विवरण..." rows="3"></textarea>
+            <button type="submit" class="citizen-submit-btn">खबर भेजें <i class="fa-solid fa-paper-plane"></i></button>
+          </form>
+        </div>
+
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- ===== ARTICLE MODAL (Read full article) ===== -->
+  <div class="modal-backdrop" id="article-modal-backdrop">
+    <div class="article-modal" id="article-modal-box">
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="बंद करें"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-img-wrap">
+        <img src="" alt="" id="modal-img">
+        <span class="modal-cat-badge" id="modal-cat-badge"></span>
+      </div>
+      <div class="modal-body-content">
+        <h2 id="modal-title"></h2>
+        <div class="modal-meta">
+          <span><i class="fa-solid fa-calendar-day"></i> <span id="modal-date"></span></span>
+          <span><i class="fa-solid fa-eye"></i> <span id="modal-views"></span> व्यूज़</span>
+          <span><i class="fa-solid fa-clock"></i> <span id="modal-readtime"></span></span>
+        </div>
+        <div class="modal-article-text" id="modal-article-text"></div>
+        <div class="modal-share-row">
+          <span>शेयर करें:</span>
+          <a href="#" class="share-btn share-fb" id="share-fb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="share-btn share-wa" id="share-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#" class="share-btn share-tg" id="share-tg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+          <button class="share-btn share-copy" id="share-copy" title="लिंक कॉपी करें"><i class="fa-solid fa-copy"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-top wrap">
+      <div class="footer-col footer-about">
+        <div class="footer-logo-area">
+          <img src="assets/logo.jpeg" alt="सुचना छत्तीसगढ़" class="footer-logo" onerror="this.style.display='none'">
+          <div class="footer-logo-text">
+            <span class="flt-suchana">सुचना</span>
+            <span class="flt-cg">छत्तीसगढ़</span>
+          </div>
+        </div>
+        <p class="footer-desc">छत्तीसगढ़ का अग्रणी डिजिटल न्यूज़ पोर्टल। सटीक, निष्पक्ष और सबसे तेज़ खबरें।</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">श्रेणियां</h4>
+        <ul class="footer-links">
+          <li><a href="#" data-cat="Chhattisgarh">छत्तीसगढ़ समाचार</a></li>
+          <li><a href="#" data-cat="Politics">राजनीति</a></li>
+          <li><a href="#" data-cat="Crime">अपराध</a></li>
+          <li><a href="#" data-cat="Business">व्यापार</a></li>
+          <li><a href="#" data-cat="Sports">खेल-कूद</a></li>
+          <li><a href="#" data-cat="Entertainment">मनोरंजन</a></li>
+          <li><a href="#" data-cat="National">देश-विदेश</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">महत्वपूर्ण</h4>
+        <ul class="footer-links">
+          <li><a href="#">हमारे बारे में</a></li>
+          <li><a href="#">गोपनीयता नीति</a></li>
+          <li><a href="#">विज्ञापन</a></li>
+          <li><a href="#">सिटीजन पत्रकारिता</a></li>
+          <li><a href="#" id="admin-portal-link"><i class="fa-solid fa-user-shield"></i> एडमिन</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">संपर्क करें</h4>
+        <address class="footer-contact-info">
+          <p><i class="fa-solid fa-location-dot"></i> प्रेस कॉम्प्लेक्स, रायपुर, छत्तीसगढ़ - 492001</p>
+          <p><i class="fa-solid fa-envelope"></i> contact@suchanacg.com</p>
+          <p><i class="fa-solid fa-phone"></i> +91 771-2345678</p>
+        </address>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="wrap">
+        <p>© 2026 सुचना छत्तीसगढ़ न्यूज़ नेटवर्क | सर्वाधिकार सुरक्षित</p>
+        <p class="footer-tagline">सबकी खबर | सबसे पहले और सटीकता से</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== ADMIN MODAL ===== -->
+  <div class="modal-backdrop" id="admin-modal-backdrop" style="display:none;">
+    <div class="article-modal admin-modal-box" style="max-width:900px;">
+      <button class="modal-close-btn" id="admin-modal-close"><i class="fa-solid fa-xmark"></i></button>
+
+      <div class="admin-header">
+        <h2><i class="fa-solid fa-user-shield"></i> एडमिन डैशबोर्ड — सुचना छत्तीसगढ़</h2>
+        <div id="admin-status-indicator"></div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="admin-login-panel" class="admin-panel">
+        <h3>एडमिन लॉगिन</h3>
+        <p style="font-size:13px; color:#888; margin-bottom:14px;">डिफ़ॉल्ट पासवर्ड: <strong>admin123</strong></p>
+        <input type="password" id="admin-pass-input" class="admin-input" placeholder="पासवर्ड दर्ज करें">
+        <button class="admin-submit-btn" id="admin-login-btn">लॉगिन <i class="fa-solid fa-right-to-bracket"></i></button>
+      </div>
+
+      <!-- Dashboard Tabs -->
+      <div id="admin-dash-panel" class="admin-panel" style="display:none;">
+        <div class="admin-tab-row">
+          <button class="admin-tab active" data-tab="add-news">+ समाचार जोड़ें</button>
+          <button class="admin-tab" data-tab="manage-news">समाचार सूची</button>
+          <button class="admin-tab" data-tab="edit-poll">पोल बदलें</button>
+          <button class="admin-logout-btn" id="admin-logout-btn">लॉगआउट</button>
+        </div>
+
+        <!-- Tab: Add News -->
+        <div class="admin-tab-content active" id="tab-add-news">
+          <form id="admin-add-news-form" class="admin-form">
+            <input type="text" id="anf-title" placeholder="समाचार शीर्षक *" required>
+            <div class="admin-form-row">
+              <select id="anf-category">
+                <option value="Chhattisgarh">छत्तीसगढ़</option>
+                <option value="Politics">राजनीति</option>
+                <option value="Crime">अपराध</option>
+                <option value="Business">व्यापार</option>
+                <option value="Sports">खेल-कूद</option>
+                <option value="Entertainment">मनोरंजन</option>
+                <option value="National">देश-विदेश</option>
+              </select>
+              <input type="text" id="anf-readtime" placeholder="पढ़ने का समय (जैसे: 3 मिनट)" value="3 मिनट">
+            </div>
+            <input type="text" id="anf-imgurl" placeholder="इमेज URL (खाली छोड़ें = डिफ़ॉल्ट)">
+            <input type="text" id="anf-summary" placeholder="संक्षिप्त विवरण (Summary) *" required>
+            <textarea id="anf-content" rows="4" placeholder="विस्तृत समाचार (Full Content) *" required></textarea>
+            <div class="anf-checks">
+              <label><input type="checkbox" id="anf-featured"> मुख्य समाचार (Featured)</label>
+              <label><input type="checkbox" id="anf-breaking"> ब्रेकिंग न्यूज़</label>
+            </div>
+            <button type="submit" class="admin-submit-btn">प्रकाशित करें <i class="fa-solid fa-cloud-arrow-up"></i></button>
+          </form>
+        </div>
+
+        <!-- Tab: Manage News -->
+        <div class="admin-tab-content" id="tab-manage-news">
+          <div class="admin-news-list" id="admin-news-list"></div>
+        </div>
+
+        <!-- Tab: Edit Poll -->
+        <div class="admin-tab-content" id="tab-edit-poll">
+          <form id="admin-poll-form" class="admin-form">
+            <input type="text" id="apf-question" placeholder="पोल प्रश्न *" required>
+            <input type="text" id="apf-opt1" placeholder="विकल्प 1 *" value="हाँ, बिल्कुल" required>
+            <input type="text" id="apf-opt2" placeholder="विकल्प 2 *" value="नहीं" required>
+            <input type="text" id="apf-opt3" placeholder="विकल्प 3 (वैकल्पिक)" value="तटस्थ">
+            <input type="text" id="apf-opt4" placeholder="विकल्प 4 (वैकल्पिक)" value="कोई राय नहीं">
+            <button type="submit" class="admin-submit-btn">नया पोल लाइव करें <i class="fa-solid fa-check"></i></button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
